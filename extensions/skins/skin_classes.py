@@ -242,6 +242,13 @@ class ConversationV1(BaseSkin):
     tag_name = 'conversation-skin'
 
     panels_properties = {
+        'supplemental': {
+            'width': 600,
+            'height': 600,
+            'stackable_axis': BaseSkin._GADGET_PANEL_AXIS_HORIZONTAL,
+            'pixels_between_gadgets': 80,
+            'max_gadgets': 1
+        },
         'bottom': {
             'width': 350,
             'height': 100,

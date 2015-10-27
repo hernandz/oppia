@@ -18,19 +18,86 @@
 
 __author__ = 'Koji Ashida'
 
-from extensions.rules import base
 import re
+
+from extensions.rules import base
+
+
+def normalize_code(code_str):
+    """Normalizes a code string. In particular:
+
+    - Removes trailing whitespace.
+    - Removes blank newlines.
+    - Removes whitespace at the end of each line (but not at the beginning).
+    """
+    return '\n'.join(filter(
+        None, [s.rstrip() for s in code_str.rstrip().split('\n')]))
+
+
+class CodeEquals(base.CodeEvaluationRule):
+    description = (
+        'has code equal to {{x|UnicodeString}}')
+
+    def _evaluate(self, subject):
+        normalized_code = normalize_code(subject['code'])
+        normalized_expected_code = normalize_code(self.x)
+        return self._fuzzify_truth_value(
+            normalized_code == normalized_expected_code)
+
+
+class CodeContains(base.CodeEvaluationRule):
+    description = (
+        'has code that contains {{x|UnicodeString}}')
+
+    def _evaluate(self, subject):
+        normalized_code = normalize_code(subject['code'])
+        normalized_snippet = normalize_code(self.x)
+        return self._fuzzify_truth_value(
+            normalized_code.find(normalized_snippet) != -1)
+
+
+class CodeDoesNotContain(base.CodeEvaluationRule):
+    description = (
+        'has code that does not contain {{x|UnicodeString}}')
+
+    def _evaluate(self, subject):
+        normalized_code = ' '.join(subject['code'].split())
+        normalized_snippet = ' '.join(self.x.split())
+        return self._fuzzify_truth_value(
+            normalized_code.find(normalized_snippet) == -1)
 
 
 class OutputEquals(base.CodeEvaluationRule):
     description = (
-        'has output equal to {{x|UnicodeString}} (collapsing spaces)')
+        'has output equal to {{x|UnicodeString}}')
 
     def _evaluate(self, subject):
-        normalized_result = ' '.join(subject['output'].split())
+        normalized_output = ' '.join(subject['output'].split())
         normalized_expected_output = ' '.join(self.x.split())
         return self._fuzzify_truth_value(
-            normalized_result == normalized_expected_output)
+            normalized_output == normalized_expected_output)
+
+
+class OutputContains(base.CodeEvaluationRule):
+    description = (
+        'has output that contains {{x|UnicodeString}}')
+
+    def _evaluate(self, subject):
+        normalized_output = ' '.join(subject['output'].split())
+        normalized_snippet = ' '.join(self.x.split())
+        return self._fuzzify_truth_value(
+            normalized_output.find(normalized_snippet) != -1)
+
+
+class OutputDoesNotContain(base.CodeEvaluationRule):
+    description = (
+        'has output that does not contain {{x|UnicodeString}}')
+
+    def _evaluate(self, subject):
+        normalized_output = ' '.join(subject['output'].split())
+        normalized_snippet = ' '.join(self.x.split())
+        return self._fuzzify_truth_value(
+            normalized_output.find(normalized_snippet) == -1)
 
 
 class ResultsInError(base.CodeEvaluationRule):
@@ -38,6 +105,17 @@ class ResultsInError(base.CodeEvaluationRule):
 
     def _evaluate(self, subject):
         return self._fuzzify_truth_value(bool(subject['error'].strip()))
+
+
+class ErrorContains(base.CodeEvaluationRule):
+    description = (
+        'has error message that contains {{x|UnicodeString}}')
+
+    def _evaluate(self, subject):
+        normalized_error = ' '.join(subject['error'].split())
+        normalized_snippet = ' '.join(self.x.split())
+        return self._fuzzify_truth_value(
+            normalized_error.find(normalized_snippet) != -1)
 
 
 class FuzzyMatches(base.CodeEvaluationRule):

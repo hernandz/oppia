@@ -121,7 +121,7 @@ html, body {
   /* This is the width of the main card, plus the width of the supplemental
      card, plus a 12px margin between them.
   */
-  max-width: 1084px;
+  max-width: 1184px;
 }
 
 .conversation-skin-main-tutor-card,
@@ -295,7 +295,7 @@ html, body {
 
 .conversation-skin-right-card-container {
   margin-left: 12px;
-  width: 600px;
+  width: 700px;
 }
 
 div.conversation-skin-supplemental-card {
@@ -307,7 +307,7 @@ div.conversation-skin-supplemental-card {
   padding: 8px;
   position: absolute;
   right: 0;
-  width: 600px;
+  width: 700px;
 }
 
 .conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {

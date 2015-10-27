@@ -25,6 +25,90 @@ from extensions.rules import code_evaluation
 class CodeEvaluationRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on CodeEvaluation objects."""
 
+    def test_code_equals_rule(self):
+        rule = code_evaluation.CodeEquals(
+            'def x():\n'
+            '    y = \'ab    c\'\n'
+            '    return x')
+
+        self.assertFuzzyTrue(rule.eval({
+            'code': (
+                'def x():\n'
+                '    y = \'ab    c\'\n'
+                '    return x'
+            ),
+            'output': 'Original code',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        self.assertFuzzyTrue(rule.eval({
+            'code': (
+                'def x():\n'
+                '    y = \'ab    c\'\n'
+                '    \n'
+                '    return x'
+            ),
+            'output': 'Extra newline with spaces',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        self.assertFuzzyTrue(rule.eval({
+            'code': (
+                'def x():        \n'
+                '    y = \'ab    c\'\n'
+                '    return x'
+            ),
+            'output': 'Extra trailing whitespace on first line',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        self.assertFuzzyTrue(rule.eval({
+            'code': (
+                'def x(): \t\n'
+                '    y = \'ab    c\'\n'
+                '    return x\n\n\n'
+            ),
+            'output': 'Extra trailing whitespace; tab character in first line',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        self.assertFuzzyFalse(rule.eval({
+            'code': (
+                'def x():\n'
+                '  y = \'ab    c\'\n'
+                '    return x'
+            ),
+            'output': 'Changing spaces at start of a line',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        self.assertFuzzyFalse(rule.eval({
+            'code': (
+                'def x():'
+                '    y = \'ab    c\'\n'
+                '    return x'
+            ),
+            'output': 'Missing newline in first line',
+            'evaluation': '',
+            'error': ''
+        }))
+
+        self.assertFuzzyFalse(rule.eval({
+            'code': (
+                'def x():'
+                '    y = \'ab c\'\n'
+                '    return x'
+            ),
+            'output': 'Changing spaces inside quotes',
+            'evaluation': '',
+            'error': ''
+        }))
+
     def test_output_equals_rule(self):
         rule = code_evaluation.OutputEquals('1')
 
@@ -103,3 +187,5 @@ class CodeEvaluationRuleUnitTests(test_utils.GenericTestBase):
             'evaluation': '',
             'error': ''
         }))
+
+
